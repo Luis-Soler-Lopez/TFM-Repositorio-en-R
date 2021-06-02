@@ -1,0 +1,13 @@
+{
+	"n_targets": 28141,
+	"n_bootstraps": 0,
+	"n_processed": 17889813,
+	"n_pseudoaligned": 7032613,
+	"n_unique": 6970881,
+	"p_pseudoaligned": 39.3,
+	"p_unique": 39.0,
+	"kallisto_version": "0.46.1",
+	"index_version": 10,
+	"start_time": "Fri May  7 23:03:43 2021",
+	"call": "./kallisto quant -i B_germanica.idx -o /home/luis/Documentos/TFM/ED2_2/Mapping SRR5656364_trimmomatic_1.fastq SRR5656364_trimmomatic_2.fastq SRR5656364_unpaired_1.fastq SRR5656364_unpaired_2.fastq"
+}

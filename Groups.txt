@@ -1,0 +1,7 @@
+muestra	condicion
+ED0.1	día-0
+ED0.2	día-0
+ED1.1	día-1
+ED1.2	día-1
+ED2.1	día-2
+ED2.2	día-2
