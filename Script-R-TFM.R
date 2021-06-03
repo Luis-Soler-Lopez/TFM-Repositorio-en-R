@@ -20,6 +20,7 @@ library(org.Dm.eg.db)
 library(genefilter)
 library(multtest)
 library(Rgraphviz)
+setwd("C:/Users/luis_/Documents/Académico/Mastér en Bioinformatica y Bioestadística/TFM/Proyecto")
 dir<-getwd()
 
 BGER<-read.table("BGER-mod.fna",header=FALSE)
@@ -31,7 +32,7 @@ GeneNames<-cbind(BGER,BGER[,1])
 colnames(GeneNames)<-c("geneID","transcriptID")
 head(GeneNames)
 write.table(GeneNames, file ="TransciptNames.txt",sep="\t",quote = FALSE,row.names= FALSE)
-Groups<-data.frame(muestra=c("ED0.1","ED0.2","ED1.1","ED1.2","ED2.1","ED2.2"),condicion=c("dÃ­a-0","dÃ­a-0","dÃ­a-1","dÃ­a-1","dÃ­a-2","dÃ­a-2"))
+Groups<-data.frame(muestra=c("ED0.1","ED0.2","ED1.1","ED1.2","ED2.1","ED2.2"),condicion=c("día-0","día-0","día-1","día-1","día-2","día-2"))
 write.table(Groups, file ="Groups.txt",sep="\t",quote = FALSE,row.names= FALSE)
 dir<-getwd()
 
@@ -39,7 +40,7 @@ archivos<-file.path(dir,"kallisto",Groups$muestra,"abundance.h5")
 names(files)<-Groups$muestra
 tx2gene<-read.table("TransciptNames.txt",header = TRUE)
 txi<-tximport(archivos,type="kallisto",tx2gene=tx2gene,countsFromAbundance="no")
-coldata<-data.frame(condition=factor(rep(c("dÃ­a-0","dÃ­a-1","dÃ­a-2"),each=2)))
+coldata<-data.frame(condition=factor(rep(c("día-0","día-1","día-2"),each=2)))
 rownames(coldata)<-colnames(txi$counts)
 ddsTxi<-DESeqDataSetFromTximport(txi,colData=coldata,design=~condition)
 
@@ -69,18 +70,18 @@ with(subset(result, padj<0.01), points(log2FoldChange, -log10(pvalue), pch=20, c
 orthologous<-read.table("1_2_1_orthologs.tab",header = FALSE,sep = "\t",row.names = NULL)
 names(orthologous)<-c("Drosophila","B_germanica")
 EXP<-read.table("AED_BGER-mod.list",header = TRUE,sep = "\t",dec = ",",row.names = NULL)
-EXP<-data.frame(EXP$row.names,EXP$pvalue,row.names = NULL)
-names(EXP)<-c("B_germanica", "pvalue")
+EXP<-data.frame(EXP$row.names,EXP$padj,row.names = NULL)
+names(EXP)<-c("B_germanica", "padj")
 orthologous_AED<-orthologous$Drosophila[match(EXP$B_germanica,orthologous$B_germanica)]
 orthologous_AED<-orthologous_AED[!is.na(orthologous_AED)]
-EXPpvalue<-orthologous$B_germanica[match(EXP$B_germanica,orthologous$B_germanica)]
-EXPpvalue<-EXPpvalue[!is.na(EXPpvalue)]
-EXPpvalue<-EXP$pvalue[match(EXPpvalue,EXP$B_germanica)]
-orthologous_AED<-data.frame(orthologous_AED,EXPpvalue)
-names(orthologous_AED)<-c("Drosophila","pvalue")
+EXPpadj<-orthologous$B_germanica[match(EXP$B_germanica,orthologous$B_germanica)]
+EXPpadj<-EXPpadj[!is.na(EXPpadj)]
+EXPpadj<-EXP$padj[match(EXPpadj,EXP$B_germanica)]
+orthologous_AED<-data.frame(orthologous_AED,EXPpadj)
+names(orthologous_AED)<-c("Drosophila","padj")
 write.table(orthologous_AED,file="Drosophila_AED.list",sep = "\t",col.names=c("genes","pvalue"),row.names =FALSE)
 
-Dlist<-as.numeric(orthologous_AED$pvalue)
+Dlist<-as.numeric(orthologous_AED$padj)
 names(Dlist)<-orthologous_AED$Drosophila
 topDiffGenes <- function(allScore) {
   return(allScore < 0.01)
@@ -88,8 +89,8 @@ topDiffGenes <- function(allScore) {
 GOdata<-new("topGOdata", description = "GO terms para B.germanica",ontology = "BP", allGenes = Dlist, geneSel = topDiffGenes, nodeSize = 10, annot = annFUN.org, ID = "ensembl", mapping = "org.Dm.eg")
 resultFis<-runTest(GOdata, algorithm = "classic", statistic = "fisher")
 resultKS.elim<-runTest(GOdata, algorithm = "elim", statistic = "ks")
-allRes<-GenTable(GOdata, classicFisher = resultFis, elimKS = resultKS.elim, orderBy = "elimKS", ranksOf = "classicFisher", topNodes = 25)
+allRes<-GenTable(GOdata, classicFisher = resultFis, elimKS = resultKS.elim, orderBy = "elimKS", ranksOf = "classicFisher", topNodes = 1000)
 write.table(allRes,file="GOresults.list",sep = "\t",col.names=names(allRes),row.names =FALSE)
-showSigOfNodes(GOdata, score(resultFis), firstSigNodes = 19, useInfo = 'def')
-showSigOfNodes(GOdata, score(resultKS.elim), firstSigNodes = 5, useInfo = 'def')
+showSigOfNodes(GOdata, score(resultFis), firstSigNodes = 5, useInfo = 'def')
+showSigOfNodes(GOdata, score(resultKS.elim), firstSigNodes = 3, useInfo = 'def')
 
