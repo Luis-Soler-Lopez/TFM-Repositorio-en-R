@@ -9,6 +9,8 @@ BiocManager::install("topGO")
 BiocManager::install("org.Dm.eg.db")
 BiocManager::install("multtest")
 BiocManager::install("Rgraphviz")
+install.packages("textshape")
+install.packages("gt")
 library(tximport)
 library(rhdf5)
 library(readr)
@@ -20,6 +22,8 @@ library(org.Dm.eg.db)
 library(genefilter)
 library(multtest)
 library(Rgraphviz)
+library(textshape)
+library(gt)
 setwd("C:/Users/luis_/Documents/Académico/Mastér en Bioinformatica y Bioestadística/TFM/Proyecto")
 dir<-getwd()
 
@@ -85,12 +89,16 @@ Dlist<-as.numeric(orthologous_AED$padj)
 names(Dlist)<-orthologous_AED$Drosophila
 topDiffGenes <- function(allScore) {
   return(allScore < 0.01)
-  }
+}
 GOdata<-new("topGOdata", description = "GO terms para B.germanica",ontology = "BP", allGenes = Dlist, geneSel = topDiffGenes, nodeSize = 10, annot = annFUN.org, ID = "ensembl", mapping = "org.Dm.eg")
 resultFis<-runTest(GOdata, algorithm = "classic", statistic = "fisher")
-resultKS.elim<-runTest(GOdata, algorithm = "elim", statistic = "ks")
-allRes<-GenTable(GOdata, classicFisher = resultFis, elimKS = resultKS.elim, orderBy = "elimKS", ranksOf = "classicFisher", topNodes = 1000)
+allRes<-GenTable(GOdata, classicFisher = resultFis, orderBy = "classicFisher", ranksOf = "classicFisher", topNodes = 1000)
 write.table(allRes,file="GOresults.list",sep = "\t",col.names=names(allRes),row.names =FALSE)
-showSigOfNodes(GOdata, score(resultFis), firstSigNodes = 5, useInfo = 'def')
-showSigOfNodes(GOdata, score(resultKS.elim), firstSigNodes = 3, useInfo = 'def')
+showSigOfNodes(GOdata, score(resultFis), firstSigNodes = 5, useInfo = 'all')
+allRes2<-gt(data=allRes)
+allRes2<-allRes2 %>%
+  tab_header(
+    title = "Gene Ontology enrichment analisis",
+    subtitle = "Resultados según estadístico de Fisher")
+allRes2
 
