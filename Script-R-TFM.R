@@ -24,7 +24,7 @@ library(multtest)
 library(Rgraphviz)
 library(textshape)
 library(gt)
-setwd("C:/Users/luis_/Documents/Académico/Mastér en Bioinformatica y Bioestadística/TFM/Proyecto")
+
 dir<-getwd()
 
 BGER<-read.table("BGER-mod.fna",header=FALSE)
@@ -36,7 +36,7 @@ GeneNames<-cbind(BGER,BGER[,1])
 colnames(GeneNames)<-c("geneID","transcriptID")
 head(GeneNames)
 write.table(GeneNames, file ="TransciptNames.txt",sep="\t",quote = FALSE,row.names= FALSE)
-Groups<-data.frame(muestra=c("ED0.1","ED0.2","ED1.1","ED1.2","ED2.1","ED2.2"),condicion=c("día-0","día-0","día-1","día-1","día-2","día-2"))
+Groups<-data.frame(muestra=c("ED0.1","ED0.2","ED1.1","ED1.2","ED2.1","ED2.2"),condicion=c("dÃ­a-0","dÃ­a-0","dÃ­a-1","dÃ­a-1","dÃ­a-2","dÃ­a-2"))
 write.table(Groups, file ="Groups.txt",sep="\t",quote = FALSE,row.names= FALSE)
 dir<-getwd()
 
@@ -44,7 +44,7 @@ archivos<-file.path(dir,"kallisto",Groups$muestra,"abundance.h5")
 names(files)<-Groups$muestra
 tx2gene<-read.table("TransciptNames.txt",header = TRUE)
 txi<-tximport(archivos,type="kallisto",tx2gene=tx2gene,countsFromAbundance="no")
-coldata<-data.frame(condition=factor(rep(c("día-0","día-1","día-2"),each=2)))
+coldata<-data.frame(condition=factor(rep(c("dÃ­a-0","dÃ­a-1","dÃ­a-2"),each=2)))
 rownames(coldata)<-colnames(txi$counts)
 ddsTxi<-DESeqDataSetFromTximport(txi,colData=coldata,design=~condition)
 
@@ -99,6 +99,6 @@ allRes2<-gt(data=allRes)
 allRes2<-allRes2 %>%
   tab_header(
     title = "Gene Ontology enrichment analisis",
-    subtitle = "Resultados según estadístico de Fisher")
+    subtitle = "Resultados segÃºn estadÃ­stico de Fisher")
 allRes2
 
