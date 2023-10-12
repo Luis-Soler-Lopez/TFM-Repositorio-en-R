@@ -1,2 +1,2 @@
-# TFM-Repositorio-en-R
+# TFM-Repositorio-n-R
 Repositorio del proyecto de R para el TFM “Análisis de datos ARN-seq para estudiar el desarrollo embrionario en insectos”
